@@ -1,0 +1,7 @@
+.vs
+out
+bins
+bin/*
+/Library
+/Builds
+/AssetBundles
