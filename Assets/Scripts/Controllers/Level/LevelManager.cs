@@ -6,11 +6,14 @@ namespace FlappyDank.Controllers
     public class LevelManager : MonoBehaviour, IFrameListener
     {
         public event EventHandler<BasketHitEventArgs> BasketHitEvent;
-        public event EventHandler BallMissedEvent;
+        public event EventHandler LevelFailedEvent;
         public event EventHandler BasketTouchEvent;
 
+        [Header("Managers")]
         [SerializeField]
         private BasketsSpawner _basketsSpawner;
+        [SerializeField]
+        private EdgesManager _edgesManager;
 
         [Header("Scenario")]
         [SerializeField]
@@ -22,18 +25,19 @@ namespace FlappyDank.Controllers
 
         private GameObject _target;
         private float _lastCreatedPosition = float.MinValue;
-        private float _bottomEdge = float.MinValue;
 
         private void Awake()
         {
             _basketsSpawner.BasketHitEvent += BasketsSpawner_OnBasketHitEventHandler;
             _basketsSpawner.BaskedLeftEvent += BasketsSpawner_OnBaskedLeftEventHandler;
             _basketsSpawner.BasketTouchedEvent += BasketsSpawner_OnBasketTouchedEventHandler;
+
+            _edgesManager.EdgeHitEvent += EdgesManager_OnEdgeHitEventHanlder;
         }
 
-        public void SetBottomEdge(float bottomEdge)
+        public void SetVerticalEdges(float topEdge, float bottomEdge)
         {
-            _bottomEdge = bottomEdge;
+            _edgesManager.SetVerticalEdges(topEdge, bottomEdge);
         }
 
         public void SetFollowedTarget(GameObject target)
@@ -52,12 +56,6 @@ namespace FlappyDank.Controllers
         {
             var nextPositionForCreating = _lastCreatedPosition + _frequencyCreating;
 
-            if (_target.transform.position.y < _bottomEdge)
-            {
-                BallMissedEvent?.Invoke(this, EventArgs.Empty);
-                return;
-            }
-
             if (_target.transform.position.x > nextPositionForCreating)
             {
                 _basketsSpawner.CreateBasket(_target.transform.position);
@@ -65,6 +63,7 @@ namespace FlappyDank.Controllers
             }
 
             _basketsSpawner.RefreshByPoint(_target.transform.position);
+            _edgesManager.RefreshByPoint(_target.transform.position);
         }
 
         private void BasketsSpawner_OnBasketTouchedEventHandler(object sender, EventArgs e)
@@ -83,7 +82,12 @@ namespace FlappyDank.Controllers
             if (wasHit)
                 return;
 
-            BallMissedEvent?.Invoke(this, EventArgs.Empty);
+            LevelFailedEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void EdgesManager_OnEdgeHitEventHanlder(object sender, EventArgs e)
+        {
+            LevelFailedEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 }

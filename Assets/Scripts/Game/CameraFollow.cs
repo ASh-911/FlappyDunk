@@ -9,7 +9,7 @@ namespace FlappyDank
         [SerializeField]
         private GameObject _target;
         [SerializeField]
-        private Vector2 _offset;
+        private Vector3 _offset;
 
         private Camera _camera;
 
@@ -25,7 +25,7 @@ namespace FlappyDank
 
         public void UpdateFrame()
         {
-            var updatedPosition = new Vector2(_target.transform.position.x, transform.position.y);
+            var updatedPosition = new Vector3(_target.transform.position.x, transform.position.y, _camera.transform.position.z);
             transform.position = updatedPosition + _offset;
         }
     }

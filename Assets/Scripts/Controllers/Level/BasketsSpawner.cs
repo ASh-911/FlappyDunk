@@ -40,11 +40,11 @@ namespace FlappyDank.Controllers
         public void CreateBasket(Vector2 position)
         {
             var basket = _basketsPool.Get().GetComponent<Basket>();
-            basket.Reset();
+            basket.ResetBasket();
             var positionY = UnityEngine.Random.Range(_bottomEdgeY, _topEdgeY);
-            var rotationZ = UnityEngine.Random.Range(-_counterclockwiseDegree, _clockwiseDegree);
+            var rotationY = UnityEngine.Random.Range(-_counterclockwiseDegree, _clockwiseDegree);
             basket.transform.position = new Vector3(position.x + _rangeVisibility, positionY, basket.transform.position.z);
-            basket.transform.rotation = Quaternion.Euler(basket.transform.localRotation.eulerAngles.x, basket.transform.localRotation.eulerAngles.y, rotationZ);
+            basket.transform.rotation = Quaternion.Euler(basket.transform.localRotation.eulerAngles.x, rotationY, basket.transform.localRotation.eulerAngles.z);
             _visibleProcessedObjects.Add(basket, false);
 
             basket.BasketHitEvent  += Basket_OnBasketHitEventHandler;

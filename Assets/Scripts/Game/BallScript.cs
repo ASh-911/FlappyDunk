@@ -17,6 +17,7 @@ namespace FlappyDank
 
         private Rigidbody2D _rigidbody;
         private bool _active;
+        private bool _isInit = false;
 
         private bool _upwardMovementReady = false;
 
@@ -27,26 +28,21 @@ namespace FlappyDank
 
             _rigidbody.AddForce(Vector2.right * _forwardForce);
 
-            if (_rigidbody.velocity.magnitude > _maxSpeed)
-            {
-                _rigidbody.velocity = _rigidbody.velocity.normalized * _maxSpeed;
-            }
-
             if (_upwardMovementReady)
             {
-                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _upwardForce);
+                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Vector2.up.y * _upwardForce);
                 _upwardMovementReady = false;
             }
         }
 
-        public void Start()
+        public void Begin()
         {
             _rigidbody.velocity = Vector2.zero;
             _rigidbody.simulated = true;
             _active = true;
         }
 
-        public void Stop()
+        public void Finish()
         {
             _rigidbody.simulated = false;
             _active = false;
@@ -55,16 +51,21 @@ namespace FlappyDank
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-            _rigidbody.simulated = true;
-            _active = true;
+            _rigidbody.simulated = false;
+            _active = false;
+            _isInit = false;
 
             SuperController.Instance.InputController.MouseClickEvent += InputController_OnMouseClickEventHandler;
         }
 
         private void InputController_OnMouseClickEventHandler(object sender, EventArgs e)
         {
-            if (!_active)
+            if (!_isInit)
+            {
+                _isInit = true;
+                Begin();
                 return;
+            }
 
             _upwardMovementReady = true;
         }

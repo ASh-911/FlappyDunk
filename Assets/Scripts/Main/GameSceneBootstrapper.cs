@@ -25,6 +25,10 @@ namespace FlappyDank
         private BottomPanelView _bottomPanelView;
         [SerializeField]
         private TopPanelView _topPanelView;
+        [SerializeField]
+        private GameOverView _gameOverView;
+        [SerializeField]
+        private SimpleCarousel _backCarousel;
 
         private void Awake()
         {
@@ -33,14 +37,18 @@ namespace FlappyDank
 
             _followingCamera.SetTarget(ball.gameObject);
             levelManager.SetFollowedTarget(ball.gameObject);
-            levelManager.SetBottomEdge(_bottomPanelView.AnchoredPosition.y);
+            _backCarousel.SetFollowTarget(ball.gameObject);
+            levelManager.SetVerticalEdges(_topPanelView.AnchoredPosition.y, _bottomPanelView.AnchoredPosition.y);
 
             SuperController.Instance.FrameController.AddListener(_followingCamera);
             SuperController.Instance.FrameController.AddListener(levelManager);
+            SuperController.Instance.FrameController.AddListener(_backCarousel);
             SuperController.Instance.PhysicsController.AddListener(ball);
 
             SuperController.Instance.LevelController.SetManager(levelManager);
             SuperController.Instance.LevelController.SetTopPanelView(_topPanelView);
+            SuperController.Instance.LevelController.SetGameOverView(_gameOverView);
+            SuperController.Instance.LevelController.SetBackCarousel(_backCarousel);
             SuperController.Instance.LevelController.SetPlayer(ball);
         }
     }

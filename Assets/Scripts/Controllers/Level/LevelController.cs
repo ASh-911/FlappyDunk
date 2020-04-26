@@ -8,6 +8,8 @@ namespace FlappyDank.Controllers
         void SetManager(LevelManager levelManager);
         void SetTopPanelView(TopPanelView topPanelView);
         void SetPlayer(BallScript ball);
+        void SetGameOverView(GameOverView gameOverView);
+        void SetBackCarousel(SimpleCarousel backCarousel);
     }
 
     public class LevelController : ILevelController
@@ -18,6 +20,8 @@ namespace FlappyDank.Controllers
 
         private BottomPanelView _bottomPanelView;
         private TopPanelView _topPanelView;
+        private GameOverView _gameOverView;
+        private SimpleCarousel _baclCarousel;
 
         private BallScript _player;
 
@@ -40,8 +44,13 @@ namespace FlappyDank.Controllers
             _levelManager = levelManager;
 
             _levelManager.BasketHitEvent   += LevelManager_OnBasketHitEventHandler;
-            _levelManager.BallMissedEvent  += LevelManager_OnBallMissedEventHandler;
+            _levelManager.LevelFailedEvent  += LevelManager_OnLevelFailedEventHandler;
             _levelManager.BasketTouchEvent += LevelManager_OnBasketTouchEventHandler;
+        }
+
+        public void SetGameOverView(GameOverView gameOverView)
+        {
+            _gameOverView = gameOverView;
         }
 
         public void SetTopPanelView(TopPanelView topPanelView)
@@ -73,13 +82,20 @@ namespace FlappyDank.Controllers
             _topPanelView.Combo.SetValue(value);
         }
 
+        public void SetBackCarousel(SimpleCarousel backCarousel)
+        {
+            _baclCarousel = backCarousel;
+        }
+
         private void RestartGame()
         {
             ResetCombo();
             _totalScore = 0;
 
-            _player.Start();
+            _gameOverView.HideText();
+            _player.Begin();
             _levelManager.ResetLevel();
+            _baclCarousel.ResetCarousel();
         }
 
         private void LevelManager_OnBasketHitEventHandler(object sender, BasketHitEventArgs e)
@@ -92,9 +108,10 @@ namespace FlappyDank.Controllers
             AddScoreValue();
         }
 
-        private void LevelManager_OnBallMissedEventHandler(object sender, EventArgs e)
+        private void LevelManager_OnLevelFailedEventHandler(object sender, EventArgs e)
         {
-            _player.Stop();
+            _gameOverView.ShowText();
+            _player.Finish();
         }
 
         private void LevelManager_OnBasketTouchEventHandler(object sender, EventArgs e)
